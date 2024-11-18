@@ -4,7 +4,15 @@ export default (db: Database) => ({
   findAll: async (limit = 10, offset = 0) =>
     db
       .selectFrom('screenings')
-      .selectAll()
+      .innerJoin('movies', 'movies.id', 'screenings.movieId')
+      .select([
+        'screenings.id',
+        'screenings.numbersOfTickets',
+        'screenings.numbersOfTicketsLeft',
+        'screenings.timestamp',
+        'movies.title',
+        'movies.year',
+      ])
       .limit(limit)
       .offset(offset)
       .execute(),
@@ -12,14 +20,14 @@ export default (db: Database) => ({
   findByIds: async (ids: number[]) =>
     db.selectFrom('screenings').selectAll().where('id', 'in', ids).execute(),
 
-  addScreening: async (data: string[]) =>
+  addScreening: async (data) =>
     db
       .insertInto('screenings')
       .values({
         timestamp: data.timestamp,
-        movie_id: data.movie_id,
-        numbers_of_tickets: data.tickets,
-        numbers_of_tickets_left: data.tickets,
+        movieId: data.movieId,
+        numbersOfTickets: data.tickets,
+        numbersOfTicketsLeft: data.tickets,
       })
       .executeTakeFirst(),
 })
